@@ -8,6 +8,8 @@ Example usage:
 ```cpp
 #include "modular-quadratic.h"
 
+...
+
 SolveModularQuadratic solver(a, b, c, n);
 if (solver.TrueForAllX())
 {
