@@ -9,7 +9,7 @@
 
 #include "modular-quadratic.h"
 
-#define ENABLE_ASSERTS
+//#define ENABLE_ASSERTS
 
 #ifdef ENABLE_ASSERTS
 #define ASSERT(a) do { if (!(a)) { printf("ASSERTION FAILED: %s\n", #a); __debugbreak(); } } while (0)
