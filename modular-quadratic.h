@@ -33,31 +33,17 @@
 // example usage:
 //
 // SolveModularQuadratic solver(a, b, c, n);
-// if (solver.TrueForAllX())
+// mpz_srcptr solN = solver.GetSolutionModulus();
+// gmp_printf("Solutions modulo %Zd: ", solN);
+// for (mpz_srcptr x : solver)
 // {
-//     printf("True for all x.\n");
+//     gmp_printf("%Zd, ", x);
 // }
-// else
-// {
-//     mpz_srcptr n = solver.GetSolutionModulus();
-//     gmp_printf("Solutions modulo %Zd: ", n);
-//     for (mpz_srcptr x : solver)
-//     {
-//         gmp_printf("%Zd, ", x);
-//     }
-//     printf("\n");
-// }
+// printf("\n");
 //
 class SolveModularQuadratic
 {
 private:
-    enum class SolType
-    {
-        kTrue,
-        kSingle,
-        kCrt
-    };
-
     struct PartialSol
     {
         mpz_t m_s[2];
@@ -80,8 +66,6 @@ public:
     }
 
     ~SolveModularQuadratic();
-
-    bool TrueForAllX() const { return m_solType == SolType::kTrue; }
 
     mpz_srcptr GetSolutionModulus() const;
 
@@ -143,6 +127,6 @@ private:
     std::vector<PartialSol> m_partialSols;
     std::vector<uint64_t> m_counters;
     std::vector<uint64_t> m_adjustedExps;
-    SolType m_solType;
+    bool m_singularSol;
     bool m_done;
 };

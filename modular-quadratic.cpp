@@ -9,7 +9,7 @@
 
 #include "modular-quadratic.h"
 
-//#define ENABLE_ASSERTS
+#define ENABLE_ASSERTS
 
 #ifdef ENABLE_ASSERTS
 #define ASSERT(a) do { if (!(a)) { printf("ASSERTION FAILED: %s\n", #a); __debugbreak(); } } while (0)
@@ -47,7 +47,7 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
     mpz_init(m_sol);
 
     m_done = false;
-    m_solType = SolveModularQuadratic::SolType::kCrt;
+    m_singularSol = false;
 
     MPZ_CREATE(A);
     MPZ_CREATE(B);
@@ -62,7 +62,8 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
         if (mpz_cmp_ui(C, 0) == 0)
         {
             // true for all x
-            m_solType = SolveModularQuadratic::SolType::kTrue;
+            mpz_set_ui(m_n, 1);
+            m_singularSol = true;
             return;
         }
         else
@@ -129,7 +130,7 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
         mpz_mul(m_t, m_t, C);
         mpz_neg(m_t, m_t);
         mpz_mod(m_sol, m_t, m_n);
-        m_solType = SolveModularQuadratic::SolType::kSingle;
+        m_singularSol = true;
         return;
     }
 
@@ -273,7 +274,6 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
 
 mpz_srcptr SolveModularQuadratic::GetSolutionModulus() const
 {
-    ASSERT(m_solType == SolveModularQuadratic::SolType::kCrt || m_solType == SolveModularQuadratic::SolType::kSingle);
     return m_n;
 }
 
@@ -310,10 +310,8 @@ void SolveModularQuadratic::ComputeCurrentSol()
 
 void SolveModularQuadratic::Advance()
 {
-    ASSERT(m_solType == SolveModularQuadratic::SolType::kSingle || m_solType == SolveModularQuadratic::SolType::kCrt);
-
-    // if we only had a single output or have no counters (e.g. because n == 1), we're done.
-    if (m_solType == SolveModularQuadratic::SolType::kSingle || m_facN.empty())
+    // if we only had a single output, we're done.
+    if (m_singularSol)
     {
         m_done = true;
         return;
