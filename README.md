@@ -11,17 +11,10 @@ Example usage:
 ...
 
 SolveModularQuadratic solver(a, b, c, n);
-if (solver.TrueForAllX())
+mpz_srcptr solN = solver.GetSolutionModulus();
+gmp_printf("Solutions modulo %Zd: ", solN);
+for (mpz_srcptr x : solver)
 {
-    printf("True for all x.\n");
+    gmp_printf("%Zd, ", x);
 }
-else
-{
-    mpz_srcptr n = solver.GetSolutionModulus();
-    gmp_printf("Solutions modulo %Zd: ", n);
-    for (mpz_srcptr x : solver)
-    {
-        gmp_printf("%Zd, ", x);
-    }
-    printf("\n");
-}
+printf("\n");
