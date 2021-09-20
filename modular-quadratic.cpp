@@ -76,36 +76,29 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
 
     // a or b or both nonzero
 
-    // gcd-reduce all 4
     m_adjustedExps.reserve(m_facN.size());
     for (const FactorInfo& info : m_facN)
         m_adjustedExps.push_back(info.m_exp);
 
+    // gcd-reduce all coefs
     mpz_gcd(m_t, A, B);
     mpz_gcd(m_t, m_t, C);
-    mpz_gcd(m_t, m_t, m_n);
+    mpz_gcd(m_t2, m_t, m_n);
 
-    if (mpz_cmp_ui(m_t, 1) != 0)
+    if (mpz_cmp_ui(m_t2, 1) != 0)
     {
-        mpz_divexact(A, A, m_t);
-        mpz_divexact(B, B, m_t);
-        mpz_divexact(C, C, m_t);
-        mpz_divexact(m_n, m_n, m_t);
+        mpz_divexact(m_n, m_n, m_t2);
 
         for (U64 i = 0; i < m_facN.size(); ++i)
         {
             if (m_adjustedExps[i] == 0)
                 continue;
 
-            m_adjustedExps[i] -= mpz_remove(m_t, m_t, m_facN[i].m_factor);
+            m_adjustedExps[i] -= mpz_remove(m_t2, m_t2, m_facN[i].m_factor);
         }
     }
 
     // gcd-reduce LHS
-
-    mpz_gcd(m_t, A, B);
-    mpz_gcd(m_t, m_t, C);
-
     if (mpz_cmp_ui(m_t, 1) != 0)
     {
         mpz_divexact(A, A, m_t);
@@ -142,7 +135,7 @@ void SolveModularQuadratic::Init(mpz_srcptr a, mpz_srcptr b, mpz_srcptr c, mpz_s
     //
     // break into individual factors of m and then recombine using CRT
 
-    MPZ_CREATE(D);
+    mpz_ptr D = m_sol;
 
     mpz_mul(D, B, B);
     mpz_mul_2exp(m_t, A, 2);
